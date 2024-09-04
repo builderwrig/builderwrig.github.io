@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Subjects Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #282c34;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .container {
+            width: 60%;
+        }
+        .chat-window {
+            width: 30%;
+            height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .clock {
+            width: 30%;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .subject-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .subject-item {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .subject-actions {
+            display: flex;
+            gap: 5px;
+        }
+        button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            background-color: #61dafb;
+            border: none;
+            color: #000000;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #21a1f1;
+        }
+        #newSubject {
+            margin-bottom: 10px;
+        }
+        .timestamp {
+            margin-top: 5px;
+        }
+        .priority {
+            font-weight: bold;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>School Subjects Tracker</h1>
+        <input type="text" id="newSubject" placeholder="Enter new subject">
+        <button onclick="addSubject()">Add Subject</button>
+        <ul class="subject-list" id="subjectList">
+            <!-- Subjects will be dynamically added here -->
+        </ul>
+    </div>
+
+    <div class="chat-window">
+        <iframe src="https://chat.openai.com" width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+
+    <div class="clock">
+        <h2>Local Time</h2>
+        <div id="localTime">Loading...</div>
+    </div>
+
+    <script>
+        const startTimes = {};
+
+        function addSubject() {
+            const subjectInput = document.getElementById('newSubject');
+            const subjectName = subjectInput.value.trim();
+            if (subjectName) {
+                const list = document.getElementById('subjectList');
+                const item = document.createElement('li');
+                item.className = 'subject-item';
+                item.innerHTML = `
+                    <span class="subject-name">${subjectName}</span>
+                    <div class="subject-actions">
+                        <button onclick="startTask('${subjectName}')">Start</button>
+                        <button onclick="endTask('${subjectName}')">Finish</button>
+                        <button onclick="removeSubject('${subjectName}')">Delete</button>
+                    </div>
+                    <div id="${subjectName}Timestamps" class="timestamp"></div>
+                `;
+                list.appendChild(item);
+                subjectInput.value = '';
+            }
+        }
+
+        function removeSubject(subject) {
+            const item = document.querySelector(`.subject-item .subject-name:contains('${subject}')`).parentElement;
+            item.remove();
+        }
+
+        function startTask(subject) {
+            const now = new Date().toLocaleTimeString();
+            startTimes[subject] = now;
+            document.getElementById(subject + 'Timestamps').innerHTML = `Started: ${now}`;
+        }
+
+        function endTask(subject) {
+            const now = new Date().toLocaleTimeString();
+            if (startTimes[subject]) {
+                const startTime = startTimes[subject];
+                document.getElementById(subject + 'Timestamps').innerHTML += `<br>Finished: ${now}`;
+            } else {
+                alert('You need to start this subject before finishing it!');
+            }
+        }
+
+        function updateClock() {
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('localTime').textContent = now;
+        }
+
+        setInterval(updateClock, 1000); // Update clock every second
+    </script>
+</body>
+</html>
